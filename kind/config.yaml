@@ -1,0 +1,21 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+kubeadmConfigPatches:
+  - |
+    apiVersion: kubeadm.k8s.io/v1beta2
+    kind: ClusterConfiguration
+    metadata:
+      name: config
+    apiServer:
+      extraArgs:
+        "service-account-key-file": "/etc/kubernetes/secrets/oidc-issuer.pub"
+        "service-account-signing-key-file": "/etc/kubernetes/secrets/oidc-issuer.key"
+        "api-audiences": "sts.amazonaws.com"
+        "service-account-issuer": "https://s3-us-west-2.amazonaws.com/aws-irsa-oidc-1569489612"
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: oidc-issuer.pub
+        containerPath: /etc/kubernetes/secrets/oidc-issuer.pub
+      - hostPath: oidc-issuer.key
+        containerPath: /etc/kubernetes/secrets/oidc-issuer.key
